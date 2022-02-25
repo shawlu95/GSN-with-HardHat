@@ -1,6 +1,6 @@
 const getCounter = (networkId) => {
   return {
-    4: '0xD9aC5f499bE700eC0b528724506107d219695f99'
+    4: '0x566B67A276f1a5E8148970e2141ad08F6078B0a3'
   }[networkId];
 };
 

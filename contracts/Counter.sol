@@ -3,24 +3,22 @@ pragma solidity ^0.8.7;
 
 import "@opengsn/contracts/src/BaseRelayRecipient.sol";
 
-
 contract Counter is BaseRelayRecipient {
+    uint256 public counter;
+    address public lastCaller;
+    event Increment(address indexed by, uint256 to);
 
-	uint public counter;
-	address public lastCaller;
+    constructor(address _forwarder) {
+        _setTrustedForwarder(_forwarder);
+    }
 
-	constructor(address _forwarder) {
-		_setTrustedForwarder(_forwarder);
-	}
+    function increment() public {
+        counter++;
+        lastCaller = _msgSender();
+        emit Increment(_msgSender(), counter);
+    }
 
-	function increment() public {
-		counter++;
-		lastCaller = _msgSender();
-	}
-
-	function versionRecipient() external override pure returns (string memory) {
-		return "2.2.5";
-	}
-
-} 
-
+    function versionRecipient() external pure override returns (string memory) {
+        return "2.2.5";
+    }
+}
