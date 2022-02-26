@@ -4,7 +4,7 @@ Demonstrate increment the Counter usign a gasless user. This repo is meant to be
 ### Setup
 Install dependencies.
 ```bash
-npm install
+yarn
 ```
 
 ___

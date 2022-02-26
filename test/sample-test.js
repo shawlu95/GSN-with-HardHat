@@ -47,7 +47,7 @@ describe("Test Counter", function () {
     const oldCount = await counter.methods.counter().call();
 
     // increment count using gasless user
-    const tx = await counter.methods.increment().send({ gas: 210000 });
+    await counter.methods.increment().send({ gas: 210000 });
 
     // check that counter has been incremented
     const newCount = await counter.methods.counter().call();
