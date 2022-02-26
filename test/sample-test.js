@@ -32,8 +32,11 @@ describe("Test Counter", function () {
     await provider.init();
     web3.setProvider(provider);
 
+    // This reference uses relay provider. Users can send gasless transaction
     counter = new web3.eth.Contract(Counter.abi, counterAddress);
 
+    // We use hard-hat run time (not web3) to access paymaster and 
+    // whitelist users later. This operation cost admin gas.
     const WhitelistPaymaster = await hre.ethers.getContractFactory("WhitelistPaymaster");
     paymaster = await WhitelistPaymaster.attach(paymasterAddress);
 

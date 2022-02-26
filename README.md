@@ -2,10 +2,9 @@
 Demonstrate increment the Counter usign a gasless user. This repo is meant to be used only on testnet (not local chain). All examples are using Rinkeby.
 
 ### Setup
-Install dependencies.
+Install dependencies using `yarn`. Note that two packages `@opengsn/paymasters`, `@opengsn/cli` cannot be installed using `npm`.
 ```bash
-yarn add @opengsn/paymasters @opengsn/cli
-npm install
+yarn
 ```
 
 ___
@@ -63,10 +62,15 @@ npx hardhat test --network rinkeby
 Results:
 ```bash
   Test Counter
-    ✓ Increment count from gasless user (10320ms)
+Whitelist sender 0x1bDfb38aEd8ef344f11eabA585d6e3F7190dd1F6
+    ✓ Increment count from whitelisted gasless user (33152ms)
+Failed to relay call. Results:
+Relaying errors (1):
+https://rk22.relays.opengsn.org/gsn1 => paymaster rejected in local view call to 'relayCall()' : sender not whitelisted
+    ✓ Increment count from unauthorized user (2067ms)
 
 
-  1 passing (12s)
+  2 passing (37s)
 ```
 
 Check events on [etherscan](https://rinkeby.etherscan.io/address/0x566B67A276f1a5E8148970e2141ad08F6078B0a3#events).
