@@ -7,15 +7,12 @@ const Counter = require('../artifacts/contracts/Counter.sol/Counter.json');
 
 describe("Test Counter", function () {
   let counter;
+  let paymaster;
   let admin;
-  let user;
-  let web3;
-  let chainId;
-  const gas = 210000;
 
   before(async function () {
-    web3 = new Web3(process.env.INFURA_URL);
-    chainId = await web3.eth.net.getId()
+    const web3 = new Web3(process.env.INFURA_URL);
+    const chainId = await web3.eth.net.getId()
 
     const counterAddress = address.getCounter(chainId);
     const paymasterAddress = address.getPayMaster(chainId);
@@ -35,19 +32,28 @@ describe("Test Counter", function () {
     await provider.init();
     web3.setProvider(provider);
 
-    //create a new gasless account:
-    user = provider.newAccount();
-    counter = new web3.eth.Contract(Counter.abi, counterAddress, {
-      from: user.address,
-      gasPrice: 0
-    });
+    counter = new web3.eth.Contract(Counter.abi, counterAddress);
+
+    const WhitelistPaymaster = await hre.ethers.getContractFactory("WhitelistPaymaster");
+    paymaster = await WhitelistPaymaster.attach(paymasterAddress);
+
   });
 
-  it('Increment count from gasless user', async function () {
+  it('Increment count from whitelisted gasless user', async function () {
     const oldCount = await counter.methods.counter().call();
 
+    //create a new gasless account:
+    const user = provider.newAccount();
+    console.log('Whitelist sender', user.address);
+    const tx = await paymaster.connect(admin).whitelistSender(user.address);
+    await tx.wait();
+
     // increment count using gasless user
-    const tx = await counter.methods.increment().send({ gas: 210000 });
+    await counter.methods.increment().send({
+      from: user.address,
+      gasPrice: 0,
+      gas: 210000
+    });
 
     // check that counter has been incremented
     const newCount = await counter.methods.counter().call();
@@ -55,5 +61,31 @@ describe("Test Counter", function () {
 
     // check lastCaller
     expect(await counter.methods.lastCaller().call()).to.equal(user.address);
+  });
+
+  it('Increment count from unauthorized user', async function () {
+    const oldCount = await counter.methods.counter().call();
+    const lastCaller = await counter.methods.lastCaller().call();
+
+    // Create a new gasless account. Do not whitelist
+    const user = provider.newAccount();
+    try {
+      await counter.methods.increment().send({
+        from: user.address,
+        gasPrice: 0,
+        gas: 210000
+      });
+
+      throw Error('Failed to block user!')
+    } catch (err) {
+      // check that counter is NOT incremented
+      const newCount = await counter.methods.counter().call();
+      expect(parseInt(newCount))
+        .to.equal(parseInt(oldCount));
+
+      // check lastCaller is NOT changed
+      expect(await counter.methods.lastCaller().call())
+        .to.equal(lastCaller);
+    }
   });
 });

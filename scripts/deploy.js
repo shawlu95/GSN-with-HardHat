@@ -9,7 +9,7 @@ async function main() {
 
   await counter.deployed();
   console.log("Counter deployed to:", counter.address);
-}
+};
 
 main()
   .then(() => process.exit(0))
