@@ -3,17 +3,22 @@ const { expect } = require("chai");
 const { ethers } = require("hardhat");
 const Web3 = require('web3');
 const address = require('../scripts/address');
+const util = require('../scripts/util');
 const Counter = require('../artifacts/contracts/Counter.sol/Counter.json');
 
-describe("Test Counter", function () {
+describe("Integration Test", function () {
   let counter;
   let admin;
   let user;
   let web3;
   let chainId;
-  const gas = 210000;
 
   before(async function () {
+    // Only run unit test if --network is NOT local
+    if (util.isLocal(hre.network.config.chainId)) {
+      this.skip();
+    }
+
     web3 = new Web3(process.env.INFURA_URL);
     chainId = await web3.eth.net.getId()
 
