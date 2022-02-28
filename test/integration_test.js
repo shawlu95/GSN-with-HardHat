@@ -14,7 +14,7 @@ describe("Integration Test", function () {
   let chainId;
 
   before(async function () {
-    // Only run unit test if --network is NOT local
+    // Only run integration test if --network is NOT local
     if (util.isLocal(hre.network.config.chainId)) {
       this.skip();
     }
