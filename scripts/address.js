@@ -6,7 +6,7 @@ const getCounter = (networkId) => {
 
 const getPayMaster = (networkId) => {
   return {
-    4: '0xA6e10aA9B038c9Cddea24D2ae77eC3cE38a0c016'
+    4: '0x8Edb738326d9cb48d8971be32d4E724C0A11d1f4'
   }[networkId];
 };
 

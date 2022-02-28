@@ -46,13 +46,27 @@ describe("Integration Test", function () {
       from: user.address,
       gasPrice: 0
     });
+
+    // We use hard-hat run time (not web3) to access paymaster and 
+    // whitelist users later. This operation cost admin gas.
+    const WhitelistPaymaster = await hre.ethers.getContractFactory("WhitelistPaymaster");
+    paymaster = await WhitelistPaymaster.attach(paymasterAddress);
   });
 
-  it('Increment count from gasless user', async function () {
+  it('Increment count from whitelisted user', async function () {
+    //create a new gasless account:
+    const user = provider.newAccount();
+    const tx = await paymaster.connect(admin).whitelistSender(user.address);
+    await tx.wait();
+
     const oldCount = await counter.methods.counter().call();
 
     // increment count using gasless user
-    await counter.methods.increment().send({ gas: 210000 });
+    await counter.methods.increment().send({
+      from: user.address,
+      gasPrice: 0,
+      gas: 210000
+    });
 
     // check that counter has been incremented
     const newCount = await counter.methods.counter().call();
@@ -60,5 +74,31 @@ describe("Integration Test", function () {
 
     // check lastCaller
     expect(await counter.methods.lastCaller().call()).to.equal(user.address);
+  });
+
+  it('Increment count from unauthorized user', async function () {
+    const oldCount = await counter.methods.counter().call();
+    const lastCaller = await counter.methods.lastCaller().call();
+
+    // Create a new gasless account. Do not whitelist
+    const user = provider.newAccount();
+    try {
+      await counter.methods.increment().send({
+        from: user.address,
+        gasPrice: 0,
+        gas: 210000
+      });
+
+      throw Error('Failed to block user!')
+    } catch (err) {
+      // check that counter is NOT incremented
+      const newCount = await counter.methods.counter().call();
+      expect(parseInt(newCount))
+        .to.equal(parseInt(oldCount));
+
+      // check lastCaller is NOT changed
+      expect(await counter.methods.lastCaller().call())
+        .to.equal(lastCaller);
+    }
   });
 });

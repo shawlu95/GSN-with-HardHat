@@ -33,8 +33,19 @@ npx hardhat verify --network rinkeby \
 ```
 
 ___
+ ### Deploy Whitelist Paymaster
+ Similar to the main contract, we deploy the custom paymaster contract and verify it. The whitelist paymaster has been deployed to Rinkeby [here](https://rinkeby.etherscan.io/address/0x8Edb738326d9cb48d8971be32d4E724C0A11d1f4#code)). If you want to re-deploy your own instance, remember to update [address.js](./scripts/address.js).
+ ```bash
+ # deployed to 0x8Edb738326d9cb48d8971be32d4E724C0A11d1f4
+ npx hardhat run scripts/deploy_whitelist_paymaster.js --network rinkeby
+
+ npx hardhat verify --network rinkeby \
+   0x8Edb738326d9cb48d8971be32d4E724C0A11d1f4
+ ```
+
+___
 ### Fund Paymaster
-This repo uses the accept-everything pay master. If the pay master runs out of fund, you need to deposit some ether for your paymaster, by interacting with the `RelayHub`. Make sure your `ADMIN_KEY` account has enough ether.
+Here we use the WhitelistPaymaster. If the pay master runs out of fund, you need to deposit some ether for your paymaster, by interacting with the `RelayHub`. Make sure your `ADMIN_KEY` account has enough ether.
 
 ```bash
 npx hardhat run scripts/fund.js --network rinkeby
