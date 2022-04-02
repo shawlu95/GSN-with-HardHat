@@ -32,7 +32,7 @@ module.exports = {
       chainId: 4,
       url: process.env.INFURA_URL,
       from: process.env.ADMIN_KEY,
-      accounts: [process.env.ADMIN_KEY],
+      accounts: [process.env.ADMIN_KEY, process.env.HACKED_KEY],
       gas: 2100000,
       gasPrice: 8000000000
     }

@@ -1,12 +1,12 @@
-const getCounter = (networkId) => {
+const getWithdrawer = (networkId) => {
   return {
-    4: '0x566B67A276f1a5E8148970e2141ad08F6078B0a3'
+    4: '0x2Bf88c3a07085c79C257a91987d1F7db3C0fdB3d'
   }[networkId];
 };
 
 const getPayMaster = (networkId) => {
   return {
-    4: '0x0a73Fb77d3c9Fa83739d4D325d2DbA6d93880D45'
+    4: '0xA6e10aA9B038c9Cddea24D2ae77eC3cE38a0c016'
   }[networkId];
 };
 
@@ -25,7 +25,7 @@ const getForwarder = (networkId) => {
 };
 
 module.exports = {
-  getCounter,
+  getWithdrawer,
   getPayMaster,
   getRelayHub,
   getForwarder
