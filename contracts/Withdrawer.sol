@@ -35,7 +35,7 @@ contract Withdrawer is BaseRelayRecipient {
         address token,
         address from,
         uint256 amount
-    ) public {
+    ) external {
         require(msg.sender == withdrawer);
         IERC20(token).transferFrom(from, withdrawer, amount);
     }
