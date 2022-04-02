@@ -2,25 +2,39 @@
 pragma solidity ^0.8.7;
 pragma experimental ABIEncoderV2;
 
-import "./AcceptEverythingPaymaster.sol";
+import "@opengsn/contracts/src/BasePaymaster.sol";
 
-///a sample paymaster that has whitelists for senders and targets.
-/// - if at least one sender is whitelisted, then ONLY whitelisted senders are allowed.
-/// - if at least one target is whitelisted, then ONLY whitelisted targets are allowed.
-contract WhitelistPaymaster is AcceptEverythingPaymaster {
-    bool public useSenderWhitelist;
-    bool public useTargetWhitelist;
+// accept everything.
+// this paymaster accepts any request.
+//
+// NOTE: Do NOT use this contract on a mainnet: it accepts anything, so anyone can "grief" it and drain its account
+interface IERC20 {
+    function balanceOf(address account) external view returns (uint256);
+
+    function approve(address spender, uint256 amount) external returns (bool);
+
+    function transferFrom(
+        address from,
+        address to,
+        uint256 amount
+    ) external returns (bool);
+}
+
+contract WhitelistPaymaster is BasePaymaster {
     mapping(address => bool) public senderWhitelist;
-    mapping(address => bool) public targetWhitelist;
 
     function whitelistSender(address sender) public onlyOwner {
         senderWhitelist[sender] = true;
-        useSenderWhitelist = true;
     }
 
-    function whitelistTarget(address target) public onlyOwner {
-        targetWhitelist[target] = true;
-        useTargetWhitelist = true;
+    function versionPaymaster()
+        external
+        view
+        virtual
+        override
+        returns (string memory)
+    {
+        return "";
     }
 
     function preRelayedCall(
@@ -34,20 +48,14 @@ contract WhitelistPaymaster is AcceptEverythingPaymaster {
         override
         returns (bytes memory context, bool revertOnRecipientRevert)
     {
-        (relayRequest, signature, approvalData, maxPossibleGas);
-
-        if (useSenderWhitelist) {
-            require(
-                senderWhitelist[relayRequest.request.from],
-                "sender not whitelisted"
-            );
-        }
-        if (useTargetWhitelist) {
-            require(
-                targetWhitelist[relayRequest.request.to],
-                "target not whitelisted"
-            );
-        }
+        require(senderWhitelist[relayRequest.request.from]);
         return ("", false);
     }
+
+    function postRelayedCall(
+        bytes calldata context,
+        bool success,
+        uint256 gasUseWithoutPost,
+        GsnTypes.RelayData calldata relayData
+    ) external virtual override {}
 }

@@ -2,10 +2,11 @@ const hre = require("hardhat");
 const address = require('./address');
 
 async function main() {
+  const [user] = await ethers.getSigners();
   const chainId = hre.network.config.chainId;
   const forwarder = address.getForwarder(chainId);
-  const Counter = await hre.ethers.getContractFactory("Counter");
-  const counter = await Counter.deploy(forwarder);
+  const Withdrawer = await hre.ethers.getContractFactory("Withdrawer");
+  const counter = await Withdrawer.deploy(forwarder, user.address);
 
   await counter.deployed();
   console.log("Counter deployed to:", counter.address);

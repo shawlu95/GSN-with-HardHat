@@ -3,6 +3,7 @@ require("@nomiclabs/hardhat-waffle");
 require('@nomiclabs/hardhat-etherscan');
 require('@nomiclabs/hardhat-waffle');
 require('@nomiclabs/hardhat-web3');
+require("hardhat-gas-reporter");
 
 // This is a sample Hardhat task. To learn how to create your own go to
 // https://hardhat.org/guides/create-task.html
@@ -38,11 +39,13 @@ module.exports = {
   },
   etherscan: {
     apiKey: {
+      mainnet: process.env.ETHERSCAN_TOKEN,
       rinkeby: process.env.ETHERSCAN_TOKEN
     }
   },
   gasReporter: {
-    enabled: process.env.REPORT_GAS !== undefined,
+    enabled: true,
+    coinmarketcap: process.env.COIN_MARKET_CAP_API_KEY,
     currency: 'USD',
   },
 };
